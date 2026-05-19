@@ -66,4 +66,11 @@ public class ProductOption {
         }
         this.stock -= qty;
     }
+
+    public void increaseStock(int qty) {
+        if (qty <= 0) {
+            throw new IllegalArgumentException("qty must be positive");
+        }
+        this.stock += qty;
+    }
 }
