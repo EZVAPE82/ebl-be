@@ -5,6 +5,7 @@ import com.elfbarlounge.domain.coupon.domain.Coupon;
 import com.elfbarlounge.domain.coupon.domain.CouponRepository;
 import com.elfbarlounge.domain.coupon.domain.MemberCoupon;
 import com.elfbarlounge.domain.coupon.domain.MemberCouponRepository;
+import com.elfbarlounge.domain.member.domain.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class CouponService {
 
     private final CouponRepository couponRepository;
     private final MemberCouponRepository memberCouponRepository;
+    private final MemberRepository memberRepository;
 
     /** 자동 발급: signup 시 SIGNUP, 생일 배치 시 BIRTHDAY 등 type 기반. */
     @Transactional
@@ -36,6 +38,9 @@ public class CouponService {
 
     @Transactional
     public MemberCoupon issueDirectly(Long memberId, Long couponId) {
+        if (!memberRepository.existsById(memberId)) {
+            throw ApiException.notFound("MEMBER_NOT_FOUND", "회원을 찾을 수 없습니다.");
+        }
         Coupon c = couponRepository.findById(couponId)
                 .orElseThrow(() -> ApiException.notFound("COUPON_NOT_FOUND", "쿠폰을 찾을 수 없습니다."));
         if (!c.isActive()) {

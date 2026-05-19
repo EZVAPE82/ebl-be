@@ -60,7 +60,8 @@ public class AdultVerificationController {
             @AuthenticationPrincipal AuthPrincipal admin,
             @PathVariable Long id
     ) {
-        service.approve(id, admin.memberId());
+        requireAdmin(admin);
+        service.approve(id, admin.adminUserId());
         return ResponseEntity.noContent().build();
     }
 
@@ -71,8 +72,15 @@ public class AdultVerificationController {
             @PathVariable Long id,
             @Valid @RequestBody RejectRequest req
     ) {
-        service.reject(id, admin.memberId(), req.reason());
+        requireAdmin(admin);
+        service.reject(id, admin.adminUserId(), req.reason());
         return ResponseEntity.noContent().build();
+    }
+
+    private void requireAdmin(AuthPrincipal admin) {
+        if (admin == null || !admin.isAdmin()) {
+            throw ApiException.forbidden("ADMIN_REQUIRED", "어드민 권한이 필요합니다.");
+        }
     }
 
     public record RejectRequest(@NotBlank @Size(max = 500) String reason) {}

@@ -1,6 +1,7 @@
 package com.elfbarlounge.common.config;
 
 import com.elfbarlounge.common.security.JwtAuthenticationFilter;
+import com.elfbarlounge.common.security.RateLimitFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -32,10 +33,14 @@ public class SecurityConfig {
 
     private final SecurityProperties props;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RateLimitFilter rateLimitFilter;
 
-    public SecurityConfig(SecurityProperties props, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(SecurityProperties props,
+                          JwtAuthenticationFilter jwtAuthenticationFilter,
+                          RateLimitFilter rateLimitFilter) {
         this.props = props;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.rateLimitFilter = rateLimitFilter;
     }
 
     @Bean
@@ -66,6 +71,7 @@ public class SecurityConfig {
                 // 그 외 모두 인증 필요
                 .anyRequest().authenticated()
             )
+            .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
