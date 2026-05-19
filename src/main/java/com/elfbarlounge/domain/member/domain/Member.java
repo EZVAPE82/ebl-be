@@ -139,4 +139,13 @@ public class Member extends BaseTimeEntity {
     public boolean isWithdrawn() {
         return this.status == MemberStatus.WITHDRAWN;
     }
+
+    public void changePassword(String newHash) {
+        this.passwordHash = newHash;
+    }
+
+    public void updateMarketingAgreement(boolean email, boolean sms) {
+        this.marketingEmailAgreed = email;
+        this.marketingSmsAgreed = sms;
+    }
 }
