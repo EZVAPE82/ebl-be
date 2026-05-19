@@ -93,6 +93,10 @@ public class JwtService {
         return refreshExpiry;
     }
 
+    public Duration getAccessExpiry() {
+        return accessExpiry;
+    }
+
     /** Refresh token은 평문으로 DB 저장 X. SHA-256 해시 저장. */
     public String hashRefreshToken(String rawToken) {
         try {

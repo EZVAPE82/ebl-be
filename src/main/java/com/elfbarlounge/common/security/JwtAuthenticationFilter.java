@@ -26,9 +26,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
-        String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
+        // 토큰 추출 우선순위:
+        //  1) Authorization 헤더 (기존 SPA·모바일 호환)
+        //  2) httpOnly 쿠키 (eb_at 또는 eb_aat — XSS 방어, P0-8 점진 전환)
+        String token = extractToken(request);
+        if (token != null) {
             try {
                 Claims claims = jwtService.parse(token);
                 if (!"access".equals(claims.get("typ", String.class))) {
@@ -55,5 +57,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         chain.doFilter(request, response);
+    }
+
+    private String extractToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+        // 헤더 미존재 시 쿠키 fallback (httpOnly)
+        String cookie = CookieUtil.readCookie(request, CookieUtil.COOKIE_ACCESS);
+        if (cookie != null && !cookie.isBlank()) return cookie;
+        return CookieUtil.readCookie(request, CookieUtil.COOKIE_ADMIN_ACCESS);
     }
 }

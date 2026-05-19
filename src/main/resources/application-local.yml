@@ -10,6 +10,12 @@ spring:
       enabled: true
       path: /h2-console
 
+# 로컬 전용 JWT secret — prod에선 사용 X. local 프로파일 동작용 32바이트 fallback.
+app:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:local_dev_secret_at_least_32_bytes_long_DO_NOT_USE_IN_PROD_xxxx}
+
   flyway:
     enabled: false   # local: H2 + JPA create-drop으로 빠르게
 

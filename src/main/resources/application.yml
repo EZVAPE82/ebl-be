@@ -46,7 +46,8 @@ springdoc:
 app:
   security:
     jwt:
-      secret: ${JWT_SECRET:CHANGE_ME_LOCAL_ONLY_NEVER_USE_IN_PROD_____________________}
+      # 기본값 없음 — 프로파일별 yml에서 별도 설정. prod에서 미주입 시 부팅 실패가 정상.
+      secret: ${JWT_SECRET:}
       access-expiry-min: ${JWT_ACCESS_EXPIRY_MIN:30}
       refresh-expiry-days: ${JWT_REFRESH_EXPIRY_DAYS:14}
     cors:

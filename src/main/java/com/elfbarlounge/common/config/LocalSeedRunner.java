@@ -39,7 +39,8 @@ public class LocalSeedRunner implements CommandLineRunner {
                     .name("로컬 마스터")
                     .role(AdminUser.AdminRole.MASTER)
                     .build());
-            log.warn("[local-seed] 어드민 마스터 생성: admin / LocalAdmin1!  (운영에서 절대 사용 금지)");
+            // 보안 룰 #2/9: 비밀번호 평문 로그 금지. 자격 증명은 README/admin-manual 참조.
+            log.warn("[local-seed] 어드민 마스터 계정 'admin' 생성됨 (자격 증명은 README 참조)");
         }
 
         if (policySettingRepository.count() == 0) {

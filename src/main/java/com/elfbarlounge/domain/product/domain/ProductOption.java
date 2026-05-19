@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,6 +45,11 @@ public class ProductOption {
 
     @Column(name = "visible", nullable = false)
     private boolean visible;
+
+    /** Optimistic Lock — 동시 결제 시 oversell 방지. ObjectOptimisticLockingFailureException 발생 시 재시도. */
+    @Version
+    @Column(name = "version", nullable = false)
+    private long version;
 
     @Builder
     private ProductOption(String optionGroup, String optionValue, long priceDelta,

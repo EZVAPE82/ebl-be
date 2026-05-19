@@ -1,9 +1,48 @@
+# Build 산출물
 .gradle
 build
+out
+target
+
+# Gradle wrapper jar는 필요
 !gradle/wrapper/gradle-wrapper.jar
-*.log
+
+# IDE/OS
 .idea
 .vscode
 *.iml
 .DS_Store
+Thumbs.db
+
+# 로그·임시
+*.log
+*.tmp
+logs/
+
+# 문서·미디어
 docs
+*.md
+LICENSE
+
+# 보안: 절대 이미지에 포함 금지 (rule 1)
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.jks
+secrets/
+.aws/
+.ssh/
+
+# VCS
+.git
+.gitignore
+.gitattributes
+
+# 테스트 산출물
+**/test-results
+**/jacoco
+
+# OS 캐시
+.cache/

@@ -46,12 +46,10 @@ public class MemberSelfService {
     /** 휴대폰 번호로 가입된 이메일을 마스킹 반환. 없으면 빈 Optional (메시지는 항상 동일하게). */
     @Transactional(readOnly = true)
     public Optional<String> findEmailByPhone(String phone) {
-        // MemberRepository에 phone 검색 없음 — 전체에서 단순 매칭. 운영에선 인덱스/암호화 검색 필요.
-        return memberRepository.findAll().stream()
-                .filter(m -> !m.isWithdrawn())
-                .filter(m -> phone.equals(m.getPhone()))
-                .map(m -> maskEmail(m.getEmail()))
-                .findFirst();
+        // V10에서 phone 인덱스 추가됨. 운영에선 phone 컬럼 암호화도 검토.
+        return memberRepository.findByPhoneAndStatusNot(
+                phone, com.elfbarlounge.domain.member.domain.MemberStatus.WITHDRAWN
+        ).map(m -> maskEmail(m.getEmail()));
     }
 
     /** 비밀번호 재설정 토큰 발급. 이메일 존재 여부 노출 X — 항상 200. */

@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,6 +30,7 @@ import java.util.Map;
 public class MemberSelfController {
 
     private final MemberSelfService memberSelfService;
+    private final Environment environment;
 
     @Operation(summary = "아이디(이메일) 찾기 — 휴대폰 번호로 조회, 마스킹 반환")
     @PostMapping("/api/v1/auth/find-email")
@@ -44,11 +46,21 @@ public class MemberSelfController {
     @PostMapping("/api/v1/auth/password-reset/request")
     public Map<String, Object> requestReset(@Valid @RequestBody RequestResetRequest req) {
         // 항상 동일 응답: 보안상 토큰 발급 성공 여부 미노출
-        // 운영에서는 이메일/SMS로 발송. MVP는 토큰을 응답에 노출(로컬 개발 편의) — 운영 빌드 전 제거.
+        // 운영에서는 이메일/SMS로 발송. local 프로파일에서만 devToken 노출 (개발 편의).
         Map<String, Object> body = new HashMap<>();
-        memberSelfService.issueResetToken(req.email()).ifPresent(t -> body.put("devToken", t));
+        var tokenOpt = memberSelfService.issueResetToken(req.email());
+        if (isLocalProfile()) {
+            tokenOpt.ifPresent(t -> body.put("devToken", t));
+        }
         body.put("message", "발송 요청이 접수되었습니다.");
         return body;
+    }
+
+    private boolean isLocalProfile() {
+        for (String p : environment.getActiveProfiles()) {
+            if ("local".equals(p)) return true;
+        }
+        return false;
     }
 
     @Operation(summary = "비밀번호 재설정 실행")

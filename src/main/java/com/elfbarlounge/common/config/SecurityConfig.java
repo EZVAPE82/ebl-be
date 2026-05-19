@@ -4,6 +4,7 @@ import com.elfbarlounge.common.security.JwtAuthenticationFilter;
 import com.elfbarlounge.common.security.RateLimitFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -34,43 +35,56 @@ public class SecurityConfig {
     private final SecurityProperties props;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final RateLimitFilter rateLimitFilter;
+    private final Environment environment;
 
     public SecurityConfig(SecurityProperties props,
                           JwtAuthenticationFilter jwtAuthenticationFilter,
-                          RateLimitFilter rateLimitFilter) {
+                          RateLimitFilter rateLimitFilter,
+                          Environment environment) {
         this.props = props;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.rateLimitFilter = rateLimitFilter;
+        this.environment = environment;
+    }
+
+    private boolean isLocalProfile() {
+        for (String p : environment.getActiveProfiles()) {
+            if ("local".equals(p)) return true;
+        }
+        return false;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        boolean local = isLocalProfile();
         http
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .headers(h -> h
-                // 로컬 H2 콘솔 사용을 위해 sameOrigin (운영에서는 deny 권장)
-                .frameOptions(f -> f.sameOrigin())
+                // local: H2 콘솔 사용 위해 sameOrigin / prod: deny
+                .frameOptions(f -> { if (local) f.sameOrigin(); else f.deny(); })
                 .contentTypeOptions(c -> {})
                 .referrerPolicy(r -> r.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
                 .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
             )
-            .authorizeHttpRequests(auth -> auth
-                // 공개 endpoint
-                .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/info").permitAll()
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/api/v1/public/**").permitAll()
-                .requestMatchers("/api/v1/admin/auth/**").permitAll()
+            .authorizeHttpRequests(auth -> {
+                auth
+                    .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/info").permitAll()
+                    .requestMatchers("/api/v1/auth/**").permitAll()
+                    .requestMatchers("/api/v1/public/**").permitAll()
+                    .requestMatchers("/api/v1/admin/auth/**").permitAll()
+                    .requestMatchers("/api/v1/admin/**").hasRole("ADMIN");
 
-                // 어드민 영역 (그 외)
-                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                if (local) {
+                    // local 전용: 개발 도구
+                    auth.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
+                    auth.requestMatchers("/h2-console/**").permitAll();
+                }
+                // prod에서는 swagger·h2 colsole 자체가 막힘 (요청 시 401)
 
-                // 그 외 모두 인증 필요
-                .anyRequest().authenticated()
-            )
+                auth.anyRequest().authenticated();
+            })
             .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

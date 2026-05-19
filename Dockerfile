@@ -26,8 +26,10 @@ RUN mkdir -p /workspace/extracted && \
 # ----- 2. Runtime -----
 FROM eclipse-temurin:17-jre
 
-# 비루트 사용자
-RUN groupadd -r app && useradd -r -g app app
+# 비루트 사용자 + healthcheck용 curl (wget은 일부 이미지에 미포함)
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd -r app && useradd -r -g app app
 
 WORKDIR /app
 
@@ -47,8 +49,8 @@ ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75 -XX:+UseG1GC -XX:+ExitOnOutOfMemo
 # Spring profile (운영 = prod)
 ENV SPRING_PROFILES_ACTIVE=prod
 
-# Healthcheck
+# Healthcheck — curl로 status 검증 (wget --spider는 200 외 응답도 통과시키는 케이스 있음)
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-    CMD wget -q --spider http://localhost:8080/actuator/health || exit 1
+    CMD curl -fsS http://localhost:8080/actuator/health || exit 1
 
 ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]

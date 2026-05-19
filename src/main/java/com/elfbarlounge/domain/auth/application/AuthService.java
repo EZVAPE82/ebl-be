@@ -148,7 +148,7 @@ public class AuthService {
                 .build();
         refreshTokenRepository.save(record);
 
-        long accessExpirySec = Duration.ofMinutes(30).toSeconds(); // application.yml과 일치 필요
+        long accessExpirySec = jwtService.getAccessExpiry().toSeconds();
         return TokenResponse.of(access, refresh, accessExpirySec);
     }
 

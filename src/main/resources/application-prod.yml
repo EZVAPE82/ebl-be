@@ -1,4 +1,5 @@
 spring:
+  # prod에서는 반드시 PostgreSQL 사용. H2 url은 빌드 시 Flyway/Hibernate validate에서 부팅 실패하도록 의도됨.
   datasource:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USER}
@@ -7,20 +8,40 @@ spring:
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
+      connection-timeout: 5000
+      validation-timeout: 3000
+      leak-detection-threshold: 30000
+      pool-name: elfbarlounge-pool
 
   flyway:
     enabled: true
     locations: classpath:db/migration
+    # prod에서는 baseline mismatch 시 부팅 실패 (data integrity)
+    baseline-on-migrate: false
+    validate-on-migrate: true
 
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: false
+    properties:
+      hibernate:
+        jdbc.lob.non_contextual_creation: true
+        # prod 쿼리 통계 OFF
+        generate_statistics: false
+
+  # H2 콘솔 명시적 비활성화 (의존성에 H2 jar가 끌려오더라도 콘솔은 노출 금지)
+  h2:
+    console:
+      enabled: false
 
 logging:
   level:
     root: WARN
     com.elfbarlounge: INFO
+    # 운영에서 SQL 평문 로그 금지 (PII 유출 방지, rule 4)
+    org.hibernate.SQL: OFF
+    org.hibernate.type.descriptor.sql: OFF
 
 server:
   error:
@@ -28,3 +49,9 @@ server:
     include-binding-errors: never
     include-stacktrace: never
     include-exception: false
+  # 응답 헤더에서 server 정보 숨김
+  forward-headers-strategy: framework
+  tomcat:
+    # 응답 헤더 Server 제거
+    max-http-form-post-size: 2MB
+    max-swallow-size: 2MB
