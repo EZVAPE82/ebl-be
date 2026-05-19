@@ -1,5 +1,6 @@
 package com.elfbarlounge.common.config;
 
+import com.elfbarlounge.common.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -9,6 +10,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -29,9 +31,11 @@ import java.util.List;
 public class SecurityConfig {
 
     private final SecurityProperties props;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(SecurityProperties props) {
+    public SecurityConfig(SecurityProperties props, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.props = props;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
@@ -41,7 +45,8 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .headers(h -> h
-                .frameOptions(f -> f.deny())
+                // 로컬 H2 콘솔 사용을 위해 sameOrigin (운영에서는 deny 권장)
+                .frameOptions(f -> f.sameOrigin())
                 .contentTypeOptions(c -> {})
                 .referrerPolicy(r -> r.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
                 .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
@@ -59,10 +64,8 @@ public class SecurityConfig {
 
                 // 그 외 모두 인증 필요
                 .anyRequest().authenticated()
-            );
-
-        // H2 콘솔(로컬 개발용) frame 허용
-        http.headers(h -> h.frameOptions(f -> f.sameOrigin()));
+            )
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

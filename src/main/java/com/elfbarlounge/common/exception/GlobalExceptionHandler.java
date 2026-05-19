@@ -4,9 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.Instant;
 import java.util.Map;
@@ -37,6 +41,32 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining(", "));
         log.warn("[{}] Validation - {} {} - {}", traceId, req.getMethod(), req.getRequestURI(), summary);
         return ResponseEntity.badRequest().body(body("VALIDATION_FAILED", "입력값이 올바르지 않습니다.", traceId));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleMessageNotReadable(HttpMessageNotReadableException e, HttpServletRequest req) {
+        String traceId = newTraceId();
+        log.warn("[{}] BadRequestBody - {} {}", traceId, req.getMethod(), req.getRequestURI());
+        return ResponseEntity.badRequest().body(body("MALFORMED_REQUEST", "요청 본문 형식이 올바르지 않습니다.", traceId));
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Map<String, Object>> handleMissingParam(MissingServletRequestParameterException e, HttpServletRequest req) {
+        String traceId = newTraceId();
+        log.warn("[{}] MissingParam {} - {} {}", traceId, e.getParameterName(), req.getMethod(), req.getRequestURI());
+        return ResponseEntity.badRequest().body(body("PARAM_MISSING", "필수 파라미터가 누락되었습니다.", traceId));
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Map<String, Object>> handleMethodNotAllowed(HttpRequestMethodNotSupportedException e, HttpServletRequest req) {
+        String traceId = newTraceId();
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(body("METHOD_NOT_ALLOWED", "허용되지 않은 메서드입니다.", traceId));
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNotFound(NoHandlerFoundException e, HttpServletRequest req) {
+        String traceId = newTraceId();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body("NOT_FOUND", "요청 경로를 찾을 수 없습니다.", traceId));
     }
 
     @ExceptionHandler(Exception.class)
