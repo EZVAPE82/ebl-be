@@ -59,3 +59,11 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// Docker 이미지 최적화: jar layer 분리
+bootJar {
+	archiveFileName = "app.jar"
+	layered {
+		enabled = true
+	}
+}
