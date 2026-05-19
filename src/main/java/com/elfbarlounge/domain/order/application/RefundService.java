@@ -11,6 +11,7 @@ import com.elfbarlounge.domain.order.domain.PaymentRepository;
 import com.elfbarlounge.domain.order.domain.Refund;
 import com.elfbarlounge.domain.order.domain.RefundRepository;
 import com.elfbarlounge.domain.point.application.PointService;
+import com.elfbarlounge.domain.settings.application.PolicySettingsService;
 import com.elfbarlounge.domain.product.domain.Product;
 import com.elfbarlounge.domain.product.domain.ProductOption;
 import com.elfbarlounge.domain.product.domain.ProductRepository;
@@ -40,6 +41,7 @@ public class RefundService {
     private final CouponService couponService;
     private final PointService pointService;
     private final PaymentGateway paymentGateway;
+    private final PolicySettingsService policySettingsService;
 
     @Transactional
     public Refund requestRefund(Long memberId, Long orderId, String reason) {
@@ -48,7 +50,8 @@ public class RefundService {
         if (order.getStatus() == OrderStatus.REFUNDED || order.getStatus() == OrderStatus.CANCELED) {
             throw ApiException.conflict("ORDER_ALREADY_FINAL", "이미 종결된 주문입니다.");
         }
-        long shippingFeeDeducted = 0; // 어드민 설정값
+        long shippingFeeDeducted = policySettingsService.getLong(
+                PolicySettingsService.RETURN_SHIPPING_FEE, 3000);
         long refundAmount = order.getPaidAmount() - shippingFeeDeducted;
         return refundRepository.save(Refund.builder()
                 .orderId(orderId)

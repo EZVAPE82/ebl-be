@@ -13,7 +13,10 @@ import com.elfbarlounge.domain.order.domain.OrderRepository;
 import com.elfbarlounge.domain.order.domain.OrderStatus;
 import com.elfbarlounge.domain.order.domain.Payment;
 import com.elfbarlounge.domain.order.domain.PaymentRepository;
+import com.elfbarlounge.domain.notification.application.NotificationDispatcher;
+import com.elfbarlounge.domain.notification.application.NotificationSender;
 import com.elfbarlounge.domain.point.application.PointService;
+import com.elfbarlounge.domain.settings.application.PolicySettingsService;
 import com.elfbarlounge.domain.product.domain.Product;
 import com.elfbarlounge.domain.product.domain.ProductOption;
 import com.elfbarlounge.domain.product.domain.ProductRepository;
@@ -53,6 +56,8 @@ public class OrderService {
     private final CouponService couponService;
     private final PointService pointService;
     private final PaymentGateway paymentGateway;
+    private final PolicySettingsService policySettingsService;
+    private final NotificationDispatcher notificationDispatcher;
 
     @Transactional
     public Order checkout(Long memberId, CheckoutRequest req) {
@@ -124,7 +129,7 @@ public class OrderService {
             pointService.use(memberId, pointUsed, "ORDER", null,
                     "주문 사용");
         }
-        long shippingFee = 0; // TODO: 정책 설정값 적용 (어드민 free_shipping_threshold)
+        long shippingFee = policySettingsService.calcShippingFee(productAmount);
 
         long paidAmount = productAmount + shippingFee - discountAmount - pointUsed;
         if (paidAmount < 0) {
@@ -157,6 +162,10 @@ public class OrderService {
 
         // 장바구니 비우기
         cart.clear();
+
+        // 알림 (별도 트랜잭션으로 발송)
+        notificationDispatcher.send(memberId, NotificationSender.Channel.ALIMTALK, "ORDER_PAID",
+                java.util.Map.of("orderNo", order.getOrderNo()));
 
         log.info("Order created: orderNo={} memberId={} paidAmount={}", order.getOrderNo(), memberId, paidAmount);
         return order;
