@@ -10,6 +10,8 @@ import com.elfbarlounge.domain.auth.domain.RefreshTokenRepository;
 import com.elfbarlounge.domain.member.domain.Member;
 import com.elfbarlounge.domain.member.domain.MemberRepository;
 import com.elfbarlounge.domain.member.domain.MemberType;
+import com.elfbarlounge.domain.member.domain.TermsConsent;
+import com.elfbarlounge.domain.member.domain.TermsConsentRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +35,10 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private static final String CURRENT_TERMS_VERSION = "v1";
+
     private final MemberRepository memberRepository;
+    private final TermsConsentRepository termsConsentRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -58,7 +63,24 @@ public class AuthService {
                 .build();
 
         Member saved = memberRepository.save(member);
+
+        // 약관 동의 이력 저장 (필수 3종 + 마케팅 선택)
+        saveConsent(saved.getId(), TermsConsent.TermCode.TOS, true);
+        saveConsent(saved.getId(), TermsConsent.TermCode.PRIVACY, true);
+        saveConsent(saved.getId(), TermsConsent.TermCode.YOUTH, true);
+        saveConsent(saved.getId(), TermsConsent.TermCode.MARKETING,
+                req.marketingEmailAgreed() || req.marketingSmsAgreed());
+
         return saved.getId();
+    }
+
+    private void saveConsent(Long memberId, TermsConsent.TermCode code, boolean agreed) {
+        termsConsentRepository.save(TermsConsent.builder()
+                .memberId(memberId)
+                .termCode(code)
+                .termVersion(CURRENT_TERMS_VERSION)
+                .agreed(agreed)
+                .build());
     }
 
     @Transactional

@@ -58,8 +58,9 @@ public class SecurityConfig {
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/api/v1/public/**").permitAll()
+                .requestMatchers("/api/v1/admin/auth/**").permitAll()
 
-                // 어드민 영역
+                // 어드민 영역 (그 외)
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
                 // 그 외 모두 인증 필요
