@@ -10,6 +10,8 @@ import com.elfbarlounge.domain.auth.domain.RefreshTokenRepository;
 import com.elfbarlounge.domain.member.domain.Member;
 import com.elfbarlounge.domain.member.domain.MemberRepository;
 import com.elfbarlounge.domain.member.domain.MemberType;
+import com.elfbarlounge.domain.coupon.application.CouponService;
+import com.elfbarlounge.domain.coupon.domain.Coupon;
 import com.elfbarlounge.domain.member.domain.TermsConsent;
 import com.elfbarlounge.domain.member.domain.TermsConsentRepository;
 import io.jsonwebtoken.Claims;
@@ -42,6 +44,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final CouponService couponService;
 
     @Transactional
     public Long signup(SignupRequest req) {
@@ -70,6 +73,9 @@ public class AuthService {
         saveConsent(saved.getId(), TermsConsent.TermCode.YOUTH, true);
         saveConsent(saved.getId(), TermsConsent.TermCode.MARKETING,
                 req.marketingEmailAgreed() || req.marketingSmsAgreed());
+
+        // SIGNUP 쿠폰 자동 발급 (정의된 활성 쿠폰이 있을 때만)
+        couponService.issueByType(saved.getId(), Coupon.CouponType.SIGNUP);
 
         return saved.getId();
     }
