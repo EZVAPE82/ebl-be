@@ -60,6 +60,18 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+// JVM file.encoding 을 UTF-8 로 고정 — Windows 기본 cp949 환경에서
+// data.sql/로그/리소스 파일이 깨지는 것 방지. 모든 Java 실행 task 에 적용.
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
+}
+tasks.named('bootRun') {
+	systemProperty 'file.encoding', 'UTF-8'
+}
+tasks.withType(Test).configureEach {
+	systemProperty 'file.encoding', 'UTF-8'
+}
+
 // Docker 이미지 최적화: jar layer 분리
 bootJar {
 	archiveFileName = "app.jar"
