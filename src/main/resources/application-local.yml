@@ -26,6 +26,15 @@ app:
     properties:
       hibernate:
         format_sql: true
+    # JPA가 스키마 만든 뒤 data-local.sql 실행되도록 지연
+    defer-datasource-initialization: true
+
+  # local 전용 더미 시드. data.sql 은 local profile 에서만 mode:always 로 실행.
+  # prod 에는 파일이 있어도 spring.sql.init 설정이 없어 무시됨.
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
 
 logging:
   level:
