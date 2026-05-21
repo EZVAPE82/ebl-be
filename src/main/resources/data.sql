@@ -41,37 +41,37 @@ VALUES
 (3, 1, 'ELFBAR BC3000 망고',         'elfbar-bc3000-mango',
   '3000모금 컴팩트 일회용. 트로피컬 망고.',
   '단독 사용.',
-  19000, 'ACTIVE', 'https://images.unsplash.com/photo-1496614932623-0a3a9743552e?w=600&q=80',
+  19000, 'ACTIVE', '/images/elfbar-product-1.png',
   198, 9, 4.5, 5, NULL, NOW(), NOW()),
 
 (3, 1, 'ELFBAR DUKE 멘솔',           'elfbar-duke-menthol',
   'DUKE 시리즈 — 묵직한 멘솔.',
   '교체형 카트리지 호환.',
-  32000, 'ACTIVE', 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600&q=80',
+  32000, 'ACTIVE', '/images/elfbar-product-2.png',
   87, 4, 4.6, 5, NULL, NOW(), NOW()),
 
 (4, 2, 'ELFLIQ 30ml 그린애플',       'elfliq-30-greenapple',
   '리필 액상 30ml. 그린애플.',
   'POD·탱크 호환.',
-  18000, 'ACTIVE', 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&q=80',
+  18000, 'ACTIVE', '/images/elfbar-product-1.png',
   142, 11, 4.4, 10, NULL, NOW(), NOW()),
 
 (4, 2, 'ELFLIQ 30ml 블루베리',       'elfliq-30-blueberry',
   '리필 액상 30ml. 블루베리.',
   'POD·탱크 호환.',
-  18000, 'ACTIVE', 'https://images.unsplash.com/photo-1567721913486-6585f069b332?w=600&q=80',
+  18000, 'ACTIVE', '/images/elfbar-product-2.png',
   103, 7, 4.5, 10, NULL, NOW(), NOW()),
 
 (3, 1, 'ELFBAR 800 클래식 타바코',   'elfbar-800-tobacco',
   '800모금 입문용 일회용. 클래식 타바코 노트.',
   '단독 사용.',
-  9900, 'SOLD_OUT', 'https://images.unsplash.com/photo-1535914254981-b5012eebbd15?w=600&q=80',
+  9900, 'SOLD_OUT', '/images/elfbar-product-1.png',
   410, 22, 4.2, 5, NULL, NOW(), NOW()),
 
 (4, 2, 'ELFLIQ 30ml 워터멜론',       'elfliq-30-watermelon',
   '리필 액상 30ml. 시원한 수박.',
   'POD·탱크 호환.',
-  18000, 'ACTIVE', 'https://images.unsplash.com/photo-1551038247-3d9af20df552?w=600&q=80',
+  18000, 'ACTIVE', '/images/elfbar-product-2.png',
   76, 3, 4.3, 10, NULL, NOW(), NOW());
 
 -- ===== 상품 옵션 (일부 상품에 맛/용량) =====
