@@ -164,3 +164,24 @@ VALUES
  '$2b$12$mcaw879CEiSMYi5oGL9x7u7tTzvn15yI/ChmaIvuC8vWUcPtMiJW.',
  '시스템 운영자', 'MASTER', 'ACTIVE', 0, NULL, NULL,
  NOW(), NOW());
+
+-- ===== 상품 Q&A 시드 4건 (members + admin INSERT 이후) =====
+-- member_id=1 (test@test.com), answered_by=1 (admin)
+INSERT INTO product_qnas
+  (product_id, member_id, question, answer, answered_by, answered_at,
+   is_private, visible, created_at, updated_at)
+VALUES
+(1, 1,
+ '배송은 얼마나 걸리나요? 평일 오후에 주문하면 다음날 받을 수 있을까요?',
+ '평일 13시 이전 주문 시 당일 출고됩니다. 다음날 도착 가능합니다 :)',
+ 1, NOW() - INTERVAL '2' DAY, FALSE, TRUE, NOW() - INTERVAL '3' DAY, NOW() - INTERVAL '2' DAY),
+(1, 1,
+ '맛은 어떤가요? 너무 달지 않았으면 좋겠어요.',
+ '그린애플 특유의 청량감과 약간의 단맛. 시원한 후미가 인상적입니다.',
+ 1, NOW() - INTERVAL '1' DAY, FALSE, TRUE, NOW() - INTERVAL '1' DAY, NOW() - INTERVAL '1' DAY),
+(2, 1,
+ '입고 일정 문의드립니다.',
+ NULL, NULL, NULL, FALSE, TRUE, NOW() - INTERVAL '6' HOUR, NOW() - INTERVAL '6' HOUR),
+(2, 1,
+ '교환 가능한지 비공개로 문의드립니다.',
+ NULL, NULL, NULL, TRUE, TRUE, NOW() - INTERVAL '2' HOUR, NOW() - INTERVAL '2' HOUR);
