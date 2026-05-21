@@ -29,49 +29,49 @@ VALUES
 (3, 1, 'ELFBAR BC5000 그린애플',     'elfbar-bc5000-greenapple',
   '한 번 충전으로 최대 5000모금 가능한 일회용 기기. 시원한 그린애플 향.',
   '단독 사용. 충전 케이블 USB-C.',
-  25000, 'ACTIVE', 'https://placehold.co/600x600/2e7d32/fff?text=BC5000+APPLE',
+  25000, 'ACTIVE', 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=600&q=80',
   342, 18, 4.7, 5, NULL, NOW(), NOW()),
 
 (3, 1, 'ELFBAR BC5000 블루베리',     'elfbar-bc5000-blueberry',
   '5000모금 일회용. 달콤한 블루베리 노트.',
   '단독 사용. 충전 케이블 USB-C.',
-  25000, 'ACTIVE', 'https://placehold.co/600x600/3949ab/fff?text=BC5000+BERRY',
+  25000, 'ACTIVE', 'https://images.unsplash.com/photo-1551798507-629020c81463?w=600&q=80',
   521, 32, 4.8, 5, NULL, NOW(), NOW()),
 
 (3, 1, 'ELFBAR BC3000 망고',         'elfbar-bc3000-mango',
   '3000모금 컴팩트 일회용. 트로피컬 망고.',
   '단독 사용.',
-  19000, 'ACTIVE', 'https://placehold.co/600x600/f57c00/fff?text=BC3000+MANGO',
+  19000, 'ACTIVE', 'https://images.unsplash.com/photo-1496614932623-0a3a9743552e?w=600&q=80',
   198, 9, 4.5, 5, NULL, NOW(), NOW()),
 
 (3, 1, 'ELFBAR DUKE 멘솔',           'elfbar-duke-menthol',
   'DUKE 시리즈 — 묵직한 멘솔.',
   '교체형 카트리지 호환.',
-  32000, 'ACTIVE', 'https://placehold.co/600x600/00897b/fff?text=DUKE+MENTHOL',
+  32000, 'ACTIVE', 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600&q=80',
   87, 4, 4.6, 5, NULL, NOW(), NOW()),
 
 (4, 2, 'ELFLIQ 30ml 그린애플',       'elfliq-30-greenapple',
   '리필 액상 30ml. 그린애플.',
   'POD·탱크 호환.',
-  18000, 'ACTIVE', 'https://placehold.co/600x600/43a047/fff?text=ELFLIQ+APPLE',
+  18000, 'ACTIVE', 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&q=80',
   142, 11, 4.4, 10, NULL, NOW(), NOW()),
 
 (4, 2, 'ELFLIQ 30ml 블루베리',       'elfliq-30-blueberry',
   '리필 액상 30ml. 블루베리.',
   'POD·탱크 호환.',
-  18000, 'ACTIVE', 'https://placehold.co/600x600/5e35b1/fff?text=ELFLIQ+BERRY',
+  18000, 'ACTIVE', 'https://images.unsplash.com/photo-1567721913486-6585f069b332?w=600&q=80',
   103, 7, 4.5, 10, NULL, NOW(), NOW()),
 
 (3, 1, 'ELFBAR 800 클래식 타바코',   'elfbar-800-tobacco',
   '800모금 입문용 일회용. 클래식 타바코 노트.',
   '단독 사용.',
-  9900, 'SOLD_OUT', 'https://placehold.co/600x600/795548/fff?text=ELF800+TOBACCO',
+  9900, 'SOLD_OUT', 'https://images.unsplash.com/photo-1535914254981-b5012eebbd15?w=600&q=80',
   410, 22, 4.2, 5, NULL, NOW(), NOW()),
 
 (4, 2, 'ELFLIQ 30ml 워터멜론',       'elfliq-30-watermelon',
   '리필 액상 30ml. 시원한 수박.',
   'POD·탱크 호환.',
-  18000, 'ACTIVE', 'https://placehold.co/600x600/e53935/fff?text=ELFLIQ+MELON',
+  18000, 'ACTIVE', 'https://images.unsplash.com/photo-1551038247-3d9af20df552?w=600&q=80',
   76, 3, 4.3, 10, NULL, NOW(), NOW());
 
 -- ===== 상품 옵션 (일부 상품에 맛/용량) =====
@@ -95,7 +95,7 @@ INSERT INTO banners
   (placement, image_url, link_url, alt_text, sort_order, visible, starts_at, ends_at, created_at, updated_at)
 VALUES
 ('MAIN_HERO',
- 'https://placehold.co/1920x500/1e1e1e/ffffff?text=ELFBAR+LOUNGE',
+ 'https://images.unsplash.com/photo-1530981785497-a62037228fe9?w=1920&q=80',
  '/c/best',
  '엘프바 라운지 — 정품 전자담배 전문몰',
  1, TRUE, NULL, NULL, NOW(), NOW());
@@ -130,12 +130,12 @@ INSERT INTO events (title, summary, content, banner_url, starts_at, ends_at, vis
 ('신규 회원 5천원 쿠폰',
  '가입 즉시 5,000원 쿠폰이 자동 발급됩니다.',
  '이벤트 기간 중 가입한 모든 회원에게 5,000원 즉시 사용 쿠폰을 지급합니다. 최소 주문금액 30,000원 이상.',
- 'https://placehold.co/1200x525/3949ab/fff?text=Welcome+Coupon',
+ 'https://images.unsplash.com/photo-1516383074327-ac4841225abf?w=1200&q=80',
  NOW(), NOW() + INTERVAL '30' DAY, TRUE, NOW(), NOW()),
 ('리뷰 적립금 2배 이벤트',
  '포토 리뷰 작성 시 적립금 2배 지급.',
  '구매한 상품에 사진 포함 리뷰를 남기시면 기본 적립금의 2배를 지급해드립니다.',
- 'https://placehold.co/1200x525/e53935/fff?text=Photo+Review+2x',
+ 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=1200&q=80',
  NOW(), NOW() + INTERVAL '60' DAY, TRUE, NOW(), NOW());
 
 -- ===== 테스트 회원 1명 =====
