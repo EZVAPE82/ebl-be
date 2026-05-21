@@ -137,3 +137,30 @@ INSERT INTO events (title, summary, content, banner_url, starts_at, ends_at, vis
  '구매한 상품에 사진 포함 리뷰를 남기시면 기본 적립금의 2배를 지급해드립니다.',
  'https://placehold.co/1200x525/e53935/fff?text=Photo+Review+2x',
  NOW(), NOW() + INTERVAL '60' DAY, TRUE, NOW(), NOW());
+
+-- ===== 테스트 회원 1명 =====
+-- email: test@test.com / password: Test1234!@  (BCrypt-12)
+-- status=ACTIVE (성인인증 완료 가정), member_type=KOREAN
+INSERT INTO members
+  (email, password_hash, name, phone, birth_date, gender, member_type, status, join_channel,
+   referrer_member_id, marketing_email_agreed, marketing_sms_agreed, last_login_at, deleted_at,
+   created_at, updated_at)
+VALUES
+('test@test.com',
+ '$2b$12$BpR3UQepu9/FcEa4V9/nG.Xhl2FkACr.AIJr1rbOsar0zot0N5CMm',
+ '엘프바테스터', '010-1234-5678', '1995-06-15', 'M',
+ 'KOREAN', 'ACTIVE', 'PC',
+ NULL, TRUE, TRUE, NULL, NULL,
+ NOW(), NOW());
+
+-- ===== 테스트 어드민 1명 =====
+-- username: admin / password: Admin1234!@  (BCrypt-12)
+-- role=MASTER, status=ACTIVE
+INSERT INTO admin_users
+  (username, password_hash, name, role, status, failed_login_count, locked_until, last_login_at,
+   created_at, updated_at)
+VALUES
+('admin',
+ '$2b$12$mcaw879CEiSMYi5oGL9x7u7tTzvn15yI/ChmaIvuC8vWUcPtMiJW.',
+ '시스템 운영자', 'MASTER', 'ACTIVE', 0, NULL, NULL,
+ NOW(), NOW());
