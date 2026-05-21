@@ -29,13 +29,13 @@ VALUES
 (3, 1, 'ELFBAR BC5000 그린애플',     'elfbar-bc5000-greenapple',
   '한 번 충전으로 최대 5000모금 가능한 일회용 기기. 시원한 그린애플 향.',
   '단독 사용. 충전 케이블 USB-C.',
-  25000, 'ACTIVE', 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=600&q=80',
+  25000, 'ACTIVE', '/images/elfbar-product-1.png',
   342, 18, 4.7, 5, NULL, NOW(), NOW()),
 
 (3, 1, 'ELFBAR BC5000 블루베리',     'elfbar-bc5000-blueberry',
   '5000모금 일회용. 달콤한 블루베리 노트.',
   '단독 사용. 충전 케이블 USB-C.',
-  25000, 'ACTIVE', 'https://images.unsplash.com/photo-1551798507-629020c81463?w=600&q=80',
+  25000, 'ACTIVE', '/images/elfbar-product-2.png',
   521, 32, 4.8, 5, NULL, NOW(), NOW()),
 
 (3, 1, 'ELFBAR BC3000 망고',         'elfbar-bc3000-mango',
@@ -95,7 +95,7 @@ INSERT INTO banners
   (placement, image_url, link_url, alt_text, sort_order, visible, starts_at, ends_at, created_at, updated_at)
 VALUES
 ('MAIN_HERO',
- 'https://images.unsplash.com/photo-1530981785497-a62037228fe9?w=1920&q=80',
+ '/images/hero.png',
  '/c/best',
  '엘프바 라운지 — 정품 전자담배 전문몰',
  1, TRUE, NULL, NULL, NOW(), NOW());
