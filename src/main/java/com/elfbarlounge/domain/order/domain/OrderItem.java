@@ -2,6 +2,8 @@ package com.elfbarlounge.domain.order.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -45,9 +47,19 @@ public class OrderItem {
     @Column(name = "subtotal", nullable = false)
     private long subtotal;
 
+    /** PAID = 유료 라인 (기본), FREE_GIFT = 프로모션 무료 증정 라인 */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "kind", length = 16, nullable = false)
+    private Kind kind;
+
+    /** FREE_GIFT 인 경우 어떤 프로모션 적용으로 추가됐는지 추적 (환불·정산용) */
+    @Column(name = "source_promotion_id")
+    private Long sourcePromotionId;
+
     @Builder
     public OrderItem(Long productId, Long productOptionId, String productName, String optionText,
-                     long unitPrice, int quantity) {
+                     long unitPrice, int quantity,
+                     Kind kind, Long sourcePromotionId) {
         this.productId = productId;
         this.productOptionId = productOptionId;
         this.productName = productName;
@@ -55,5 +67,13 @@ public class OrderItem {
         this.unitPrice = unitPrice;
         this.quantity = quantity;
         this.subtotal = unitPrice * quantity;
+        this.kind = kind != null ? kind : Kind.PAID;
+        this.sourcePromotionId = sourcePromotionId;
     }
+
+    public boolean isFreeGift() {
+        return kind == Kind.FREE_GIFT;
+    }
+
+    public enum Kind { PAID, FREE_GIFT }
 }

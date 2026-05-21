@@ -165,6 +165,23 @@ VALUES
  '시스템 운영자', 'MASTER', 'ACTIVE', 0, NULL, NULL,
  NOW(), NOW());
 
+-- ===== 프로모션 2건 (BOGO_SAME) =====
+-- promotion 1: ELFBAR BC5000 시리즈 (product_id 1·2) 2+1 30일
+-- promotion 2: ELFLIQ 액상 (product_id 5·6·8) 10+1 60일
+INSERT INTO promotions
+  (name, type, buy_quantity, get_quantity, gift_product_id, gift_product_option_id,
+   valid_from, valid_to, active, created_at, updated_at)
+VALUES
+('BC5000 시리즈 2+1', 'BOGO_SAME', 2, 1, NULL, NULL,
+ NOW() - INTERVAL '1' DAY, NOW() + INTERVAL '30' DAY, TRUE, NOW(), NOW()),
+('ELFLIQ 액상 10+1', 'BOGO_SAME', 10, 1, NULL, NULL,
+ NOW() - INTERVAL '1' DAY, NOW() + INTERVAL '60' DAY, TRUE, NOW(), NOW());
+
+-- 프로모션 적용 상품 매핑
+INSERT INTO promotion_products (promotion_id, product_id) VALUES
+(1, 1), (1, 2),
+(2, 5), (2, 6), (2, 8);
+
 -- ===== 상품 Q&A 시드 4건 (members + admin INSERT 이후) =====
 -- member_id=1 (test@test.com), answered_by=1 (admin)
 INSERT INTO product_qnas

@@ -21,6 +21,12 @@ import com.elfbarlounge.domain.product.domain.Product;
 import com.elfbarlounge.domain.product.domain.ProductOption;
 import com.elfbarlounge.domain.product.domain.ProductRepository;
 import com.elfbarlounge.domain.product.domain.ProductStatus;
+import com.elfbarlounge.domain.promotion.application.PromotionEvaluator;
+import com.elfbarlounge.domain.promotion.application.PromotionEvaluator.PurchaseLine;
+import com.elfbarlounge.domain.promotion.application.PromotionEvaluator.AppliedPromotion;
+
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -58,6 +64,7 @@ public class OrderService {
     private final PaymentGateway paymentGateway;
     private final PolicySettingsService policySettingsService;
     private final NotificationDispatcher notificationDispatcher;
+    private final PromotionEvaluator promotionEvaluator;
 
     @Transactional
     public Order checkout(Long memberId, CheckoutRequest req) {
@@ -114,8 +121,50 @@ public class OrderService {
                     .optionText(optionText)
                     .unitPrice(unitPrice)
                     .quantity(ci.getQuantity())
+                    .kind(OrderItem.Kind.PAID)
                     .build());
             productAmount += unitPrice * ci.getQuantity();
+        }
+
+        // 1-b. 프로모션 평가 → 무료 증정 라인 추가 (unit_price=0, kind=FREE_GIFT)
+        // 동일 상품 증정(BOGO_SAME): 추가 재고 차감 필요. 별도 사은품(BOGO_OTHER):
+        // gift_product_id 재고 차감 (현재 BOGO_SAME 만 시드. OTHER 는 추후).
+        List<PurchaseLine> lines = new ArrayList<>();
+        for (CartItem ci : cart.getItems()) {
+            lines.add(new PurchaseLine(ci.getProductId(), ci.getProductOptionId(), ci.getQuantity()));
+        }
+        List<AppliedPromotion> appliedPromos = promotionEvaluator.evaluate(lines);
+        for (AppliedPromotion ap : appliedPromos) {
+            Product gift = productRepository.findById(ap.getGiftProductId())
+                    .orElseThrow(() -> ApiException.notFound("PROMO_GIFT_NOT_FOUND",
+                            "프로모션 사은품 상품을 찾을 수 없습니다."));
+            String giftOptionText = null;
+            if (ap.getGiftProductOptionId() != null) {
+                ProductOption opt = gift.getOptions().stream()
+                        .filter(o -> o.getId().equals(ap.getGiftProductOptionId()))
+                        .findFirst().orElse(null);
+                if (opt != null) {
+                    if (opt.getStock() < ap.getGiftQuantity()) {
+                        log.warn("Promotion {} gift stock short, skip. need={} stock={}",
+                                ap.getPromotionId(), ap.getGiftQuantity(), opt.getStock());
+                        continue;
+                    }
+                    giftOptionText = opt.getOptionGroup() + ": " + opt.getOptionValue();
+                    opt.decreaseStock(ap.getGiftQuantity());
+                }
+            }
+            order.addItem(OrderItem.builder()
+                    .productId(gift.getId())
+                    .productOptionId(ap.getGiftProductOptionId())
+                    .productName("[증정] " + gift.getName())
+                    .optionText(giftOptionText)
+                    .unitPrice(0)
+                    .quantity(ap.getGiftQuantity())
+                    .kind(OrderItem.Kind.FREE_GIFT)
+                    .sourcePromotionId(ap.getPromotionId())
+                    .build());
+            log.info("Promotion applied: {} ({} → {} +{})",
+                    ap.getPromotionName(), ap.getTriggerProductId(), ap.getGiftProductId(), ap.getGiftQuantity());
         }
 
         // 2. 쿠폰 + 3. 적립금
