@@ -1,3 +1,7 @@
+# 다른 프로젝트와 포트 충돌 회피용 — local 전용. prod 는 8080 유지.
+server:
+  port: 8090
+
 spring:
   datasource:
     url: jdbc:h2:mem:elfbarlounge;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
