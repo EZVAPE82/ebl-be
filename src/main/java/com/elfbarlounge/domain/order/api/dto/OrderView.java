@@ -41,11 +41,14 @@ public record OrderView(
 
     public record ItemView(
             Long id, Long productId, Long productOptionId, String productName, String optionText,
-            long unitPrice, int quantity, long subtotal
+            long unitPrice, int quantity, long subtotal,
+            String kind,                  // "PAID" | "FREE_GIFT"
+            Long sourcePromotionId
     ) {
         public static ItemView from(OrderItem i) {
             return new ItemView(i.getId(), i.getProductId(), i.getProductOptionId(),
-                    i.getProductName(), i.getOptionText(), i.getUnitPrice(), i.getQuantity(), i.getSubtotal());
+                    i.getProductName(), i.getOptionText(), i.getUnitPrice(), i.getQuantity(), i.getSubtotal(),
+                    i.getKind().name(), i.getSourcePromotionId());
         }
     }
 
