@@ -84,5 +84,5 @@ public class Banner extends BaseTimeEntity {
         return true;
     }
 
-    public enum Placement { MAIN_HERO, TOP_STRIP, SECTION }
+    public enum Placement { MAIN_HERO, MID_HERO, TOP_STRIP, SECTION }
 }
