@@ -74,7 +74,9 @@ public class SecurityConfig {
                     .requestMatchers("/api/v1/auth/**").permitAll()
                     .requestMatchers("/api/v1/public/**").permitAll()
                     .requestMatchers("/api/v1/admin/auth/**").permitAll()
-                    .requestMatchers("/api/v1/admin/**").hasRole("ADMIN");
+                    .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                    // 업로드된 사진 정적 서빙 — 누구나 GET 가능 (lightbox 보기용)
+                    .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll();
 
                 if (local) {
                     // local 전용: 개발 도구

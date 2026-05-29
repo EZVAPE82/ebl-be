@@ -41,6 +41,11 @@ dependencies {
 	// API docs (Swagger UI)
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 
+	// Image thumbnail generation — 후기 사진 800x800 / 300x300 center crop
+	// Thumbnailator: Java 표준 ImageIO 기반, 외부 native 의존성 없음.
+	// 운영 시 사용자 업로드 사진(다양한 비율) -> 800x800 정사각형 자동 변환.
+	implementation 'net.coobird:thumbnailator:0.4.20'
+
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

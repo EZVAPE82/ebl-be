@@ -18,6 +18,12 @@ spring:
         format_sql: true
         jdbc.time_zone: Asia/Seoul
 
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 60MB  # 후기 5 장 + 폼 데이터 여유
+
 server:
   port: ${SERVER_PORT:8080}
   forward-headers-strategy: framework
@@ -54,6 +60,14 @@ app:
       # local 기본 프론트 포트는 3030 (포트 충돌 회피). 3000 도 호환 위해 허용.
       # prod 는 CORS_ALLOWED_ORIGINS 환경변수로 운영 도메인 주입.
       allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3030,http://localhost:3000}
+
+  # 이미지 저장소 — 사용자 업로드 사진 (후기/프로필 등)
+  # mode=local: 로컬 파일시스템 (개발/초기 운영). 컨테이너 볼륨 마운트 필요.
+  # mode=s3:    AWS S3 (운영 권장, CloudFront CDN 연동). 향후 별도 작업.
+  image:
+    mode: ${IMAGE_STORAGE_MODE:local}
+    local-path: ${IMAGE_LOCAL_PATH:./uploads}
+    public-base-url: ${IMAGE_PUBLIC_BASE_URL:/uploads}
 
   # 외부 연동 토글 — 무니코틴 전환 시 enabled=true + 키 주입으로 즉시 활성화
   integrations:
