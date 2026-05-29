@@ -1,17 +1,16 @@
 package com.elfbarlounge.domain.order.application.payment;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
 /**
- * 로컬 개발용 결제 스텁. 무조건 성공으로 처리.
- * 운영 가기 전 PortonePaymentGateway 등 실제 구현체로 교체.
+ * 결제 스텁. 무조건 성공으로 처리.
+ * 운영 가기 전 PortonePaymentGateway 등 실제 구현체로 교체 (이 클래스를 삭제하거나
+ * @Profile("!prod") 처리). 현재는 prod 부팅 보장 위해 모든 프로파일에서 동작.
  */
 @Slf4j
-@Profile("local")
 @Component
 public class StubPaymentGateway implements PaymentGateway {
 
