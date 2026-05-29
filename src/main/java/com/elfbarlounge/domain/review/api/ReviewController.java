@@ -55,6 +55,12 @@ public class ReviewController {
         return reviewRepository.findByProductIdOrderByCreatedAtDesc(productId, pageable).map(ReviewView::from);
     }
 
+    @Operation(summary = "베스트 리뷰 목록 (공개) — 별점 4+, 사진 있는 것 우선")
+    @GetMapping("/public/reviews/best")
+    public Page<ReviewView> bestReviews(Pageable pageable) {
+        return reviewRepository.findBestPublic(pageable).map(ReviewView::from);
+    }
+
     @Operation(summary = "내 리뷰 목록")
     @GetMapping("/members/me/reviews")
     public Page<ReviewView> myReviews(@AuthenticationPrincipal AuthPrincipal principal, Pageable pageable) {
@@ -70,11 +76,13 @@ public class ReviewController {
 
     public record ReviewView(
             Long id, Long productId, Long memberId, int rating, String content,
-            boolean hasPhoto, boolean pointRewarded, LocalDateTime createdAt
+            boolean hasPhoto, List<String> photoUrls, boolean pointRewarded, LocalDateTime createdAt
     ) {
         public static ReviewView from(Review r) {
+            List<String> urls = r.getPhotos() == null ? List.of()
+                    : r.getPhotos().stream().map(p -> p.getThumbnailUrl() != null ? p.getThumbnailUrl() : p.getUrl()).toList();
             return new ReviewView(r.getId(), r.getProductId(), r.getMemberId(),
-                    r.getRating(), r.getContent(), r.isHasPhoto(), r.isPointRewarded(), r.getCreatedAt());
+                    r.getRating(), r.getContent(), r.isHasPhoto(), urls, r.isPointRewarded(), r.getCreatedAt());
         }
     }
 
